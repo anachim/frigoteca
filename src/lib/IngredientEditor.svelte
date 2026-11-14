@@ -1,6 +1,7 @@
 <script lang="ts" module>
   import { formatFraction, parseQuantity } from "$lib/fraction";
   import type { IngredientLine } from "$lib/ingredients";
+  import { parseLine, parseLines } from "$lib/parse-line";
   import { UNITS, type Unit } from "$lib/units";
 
   export interface DraftLine {
@@ -42,10 +43,44 @@
 
   const unitOptions = Object.keys(UNITS) as Unit[];
   const unitText = (u: Unit) => (u === "pz" ? "pz" : UNITS[u].singular);
+
+  let quick = $state("");
+
+  function add(lines: IngredientLine[]) {
+    if (!lines.length) return;
+    const isBlank = (d: DraftLine) => !d.name.trim() && !d.qty.trim();
+    drafts = [...drafts.filter((d) => !isBlank(d)), ...lines.map(toDraft)];
+  }
+
+  function quickKey(event: KeyboardEvent) {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    const line = parseLine(quick);
+    if (line) {
+      add([line]);
+      quick = "";
+    }
+  }
+
+  function quickPaste(event: ClipboardEvent) {
+    const text = event.clipboardData?.getData("text") ?? "";
+    if (!text.includes("\n")) return;
+    event.preventDefault();
+    add(parseLines(text));
+  }
 </script>
 
 <fieldset>
   <legend>Ingredienti</legend>
+  <input
+    class="quick"
+    bind:value={quick}
+    onkeydown={quickKey}
+    onpaste={quickPaste}
+    placeholder="Scrivi e premi Invio: 30 g zucchero, 1/4 parte gin… o incolla una lista"
+    aria-label="Aggiungi ingrediente veloce"
+    autocomplete="off"
+  />
   <datalist id="ingredient-names">
     {#each names as name (name)}<option value={name}></option>{/each}
   </datalist>

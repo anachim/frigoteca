@@ -21,7 +21,7 @@ interface Row {
   optional: number;
 }
 
-/** Converts a line to what is stored: quantity in base unit, kitchen unit remembered in display_unit. */
+/** Converts a line to what is stored: quantity in base unit, unit remembered in display_unit when it has to be. */
 export function toStored(line: IngredientLine) {
   const unit: Unit | null = line.unit ?? (line.qty ? "pz" : null);
   if (!unit || unit === "qb" || !line.qty) {
@@ -31,7 +31,7 @@ export function toStored(line: IngredientLine) {
   return {
     qty: multiply(line.qty, info.factor),
     unit: info.base,
-    displayUnit: "kitchen" in info ? unit : null,
+    displayUnit: "remember" in info ? unit : null,
   };
 }
 

@@ -21,7 +21,7 @@ ingredienti disponibili ("cosa ho nel frigo").
 - **Ricerca frigo con quantità**: l'utente indica cosa ha e quanto (quantità facoltativa).
 - **Tipi di misura** (tutte quantità assolute, tranne `parte`):
   - peso: `g`, `kg` → es. 30 g zucchero
-  - volume: `ml`, `l`, `cucchiaio`, `cucchiaino`, `tazza` → es. 100 ml latte
+  - volume: `ml`, `cl`, `l`, `cucchiaio`, `cucchiaino`, `tazza` → es. 100 ml latte
   - pezzi: `pz` → es. 1 limone, 2 uova
   - proporzione: `parte` → es. 1/4 Malibu (relativa, solo cocktail)
   - nessuna: `qb` → es. sale q.b.
@@ -109,11 +109,11 @@ CREATE VIRTUAL TABLE recipe_fts USING fts5(
 ### Fase 1 — Ricette e organizzazione
 - [x] CRUD ricette (nome, porzioni, procedimento, volume bicchiere opzionale)
 - [x] Editor ingredienti: autocomplete su ingredienti esistenti, quantità frazionaria, unità da menu
-- [ ] Inserimento ingrediente in una riga: `30 g zucchero`, `1/4 parte malibu`, `1 limone`, `sale qb`
+- [x] Inserimento ingrediente in una riga: `30 g zucchero`, `1/4 parte malibu`, `1 limone`, `sale qb`
       → quantità + unità + ingrediente, convertito in unità base (parser con test)
 - [ ] Formattazione quantità per la UI: unità base → unità leggibile (g/kg, ml/l, `display_unit`),
       frazioni comuni come frazione (1/2, 1/4), il resto arrotondato (con test)
-- [ ] Incolla lista ingredienti (una riga = un ingrediente, stesso parser)
+- [x] Incolla lista ingredienti (una riga = un ingrediente, stesso parser)
 - [ ] Lista ricette + dettaglio
 - [ ] Tag: creazione con colore/emoji, assegnazione multipla
 - [ ] Filtro lista per uno o più tag
