@@ -1,3 +1,5 @@
+import { formatFraction, type Fraction } from "./fraction";
+
 export type BaseUnit = "g" | "ml" | "pz" | "parte" | "qb";
 
 interface UnitInfo {
@@ -30,4 +32,22 @@ export const isUnit = (u: string | null): u is Unit => u !== null && u in UNITS;
 export function unitLabel(unit: Unit, plural: boolean): string {
   const info: UnitInfo = UNITS[unit];
   return plural ? info.plural : info.singular;
+}
+
+/** Picks the unit that reads best for a quantity stored in a base unit: 1500 g reads as kg. */
+export function readableUnit(qty: Fraction, base: Unit): Unit {
+  const big = qty.num >= 1000 * qty.den;
+  if (base === "g" && big) return "kg";
+  if (base === "ml" && big) return "l";
+  return base;
+}
+
+const METRIC_DIGITS: Partial<Record<Unit, number>> = { g: 1, ml: 1, kg: 2, cl: 2, l: 2 };
+const COMMON_DENOMINATORS = [1, 2, 3, 4, 8];
+
+/** Metric units read as decimals ("1,5 kg"), others as common fractions ("1/2 cucchiaio"), the rest rounded. */
+export function formatQuantity(qty: Fraction, unit: Unit | null): string {
+  const digits = unit ? METRIC_DIGITS[unit] : undefined;
+  if (digits === undefined && COMMON_DENOMINATORS.includes(qty.den)) return formatFraction(qty);
+  return (qty.num / qty.den).toLocaleString("it-IT", { maximumFractionDigits: digits ?? 2, useGrouping: false });
 }

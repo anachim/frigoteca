@@ -1,8 +1,8 @@
 <script lang="ts" module>
-  import { formatFraction, parseQuantity } from "$lib/fraction";
+  import { parseQuantity } from "$lib/fraction";
   import type { IngredientLine } from "$lib/ingredients";
   import { parseLine, parseLines } from "$lib/parse-line";
-  import { UNITS, type Unit } from "$lib/units";
+  import { formatQuantity, UNITS, type Unit } from "$lib/units";
 
   export interface DraftLine {
     key: number;
@@ -20,7 +20,7 @@
   export const toDraft = (l: IngredientLine): DraftLine => ({
     key: nextKey++,
     name: l.name,
-    qty: l.qty ? formatFraction(l.qty) : "",
+    qty: l.qty ? formatQuantity(l.qty, l.unit) : "",
     unit: l.unit ?? "",
     note: l.note,
     optional: l.optional,

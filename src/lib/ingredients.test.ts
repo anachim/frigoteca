@@ -2,6 +2,7 @@ import { expect, test } from "vitest";
 import { fraction, formatFraction, parseQuantity } from "./fraction";
 import { formatLine, getIngredients, listIngredientNames, saveIngredients, toStored, type IngredientLine } from "./ingredients";
 import { createRecipe } from "./recipes";
+import { formatQuantity, readableUnit } from "./units";
 import { testDb } from "./test-db";
 
 const line = (name: string, qty: string, unit: IngredientLine["unit"], extra: Partial<IngredientLine> = {}): IngredientLine => ({
@@ -85,4 +86,35 @@ test("lines are formatted for reading", () => {
   expect(formatLine(line("Malibu", "1/4", "parte"))).toBe("1/4 parte Malibu");
   expect(formatLine(line("sale", "", "qb"))).toBe("sale q.b.");
   expect(formatLine(line("basilico", "", null))).toBe("basilico");
+});
+
+test("quantities read in the most readable unit and format", () => {
+  expect(readableUnit(fraction(1500), "g")).toBe("kg");
+  expect(readableUnit(fraction(999), "g")).toBe("g");
+  expect(readableUnit(fraction(1000), "ml")).toBe("l");
+  expect(readableUnit(fraction(5), "pz")).toBe("pz");
+
+  expect(formatQuantity(fraction(3, 2), "kg")).toBe("1,5");
+  expect(formatQuantity(fraction(1500), "g")).toBe("1500");
+  expect(formatQuantity(fraction(1000, 3), "g")).toBe("333,3");
+  expect(formatQuantity(fraction(1, 2), "cucchiaio")).toBe("1/2");
+  expect(formatQuantity(fraction(1, 3), "parte")).toBe("1/3");
+  expect(formatQuantity(fraction(7, 10), "tazza")).toBe("0,7");
+  expect(formatQuantity(fraction(3, 2), null)).toBe("1 1/2");
+});
+
+test("stored quantities read back in a readable unit", async () => {
+  const { db, id } = await recipeIn();
+  await saveIngredients(db, id, [
+    line("Farina", "1500", "g"),
+    line("Latte", "1/2", "l"),
+    line("Acqua", "1,25", "l"),
+    line("Gin", "4", "cl"),
+  ]);
+  expect((await getIngredients(db, id)).map(formatLine)).toEqual([
+    "1,5 kg Farina",
+    "500 ml Latte",
+    "1,25 l Acqua",
+    "4 cl Gin",
+  ]);
 });

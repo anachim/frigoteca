@@ -1,6 +1,6 @@
-import { formatFraction, fraction, multiply, type Fraction } from "./fraction";
+import { fraction, multiply, type Fraction } from "./fraction";
 import type { Db } from "./recipes";
-import { isUnit, UNITS, unitLabel, type Unit } from "./units";
+import { formatQuantity, isUnit, readableUnit, UNITS, unitLabel, type Unit } from "./units";
 
 /** One ingredient line as the user sees it: quantity in the unit they chose. */
 export interface IngredientLine {
@@ -36,11 +36,10 @@ export function toStored(line: IngredientLine) {
 }
 
 function fromRow(row: Row): IngredientLine {
-  const unit = isUnit(row.display_unit) ? row.display_unit : isUnit(row.unit) ? row.unit : null;
-  const qty =
-    row.qty_num !== null && row.qty_den !== null && unit
-      ? multiply(fraction(row.qty_num, row.qty_den), 1, UNITS[unit].factor)
-      : null;
+  const base = isUnit(row.unit) ? row.unit : null;
+  const stored = row.qty_num !== null && row.qty_den !== null ? fraction(row.qty_num, row.qty_den) : null;
+  const unit = isUnit(row.display_unit) ? row.display_unit : base && stored ? readableUnit(stored, base) : base;
+  const qty = stored && unit ? multiply(stored, 1, UNITS[unit].factor) : null;
   return { name: row.name, qty, unit, note: row.note ?? "", optional: row.optional === 1 };
 }
 
@@ -99,5 +98,5 @@ export function formatLine(line: IngredientLine): string {
   if (!line.qty) return line.name;
   const plural = line.qty.num > line.qty.den;
   const unit = line.unit ? unitLabel(line.unit, plural) : "";
-  return [formatFraction(line.qty), unit, line.name].filter(Boolean).join(" ");
+  return [formatQuantity(line.qty, line.unit), unit, line.name].filter(Boolean).join(" ");
 }
