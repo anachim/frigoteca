@@ -99,6 +99,9 @@ CREATE VIRTUAL TABLE recipe_fts USING fts5(
 
 ## Fasi
 
+L'avanzamento dei punti aperti è tracciato nelle
+[issue GitHub](https://github.com/anachim/frigoteca/issues), raggruppate in milestone per fase.
+
 ### Fase 0 — Setup
 - [x] Progetto Tauri 2 + Svelte
 - [x] Plugin SQL SQLite, migrazioni con lo schema sopra
@@ -114,15 +117,15 @@ CREATE VIRTUAL TABLE recipe_fts USING fts5(
 - [x] Formattazione quantità per la UI: unità base → unità leggibile (g/kg, ml/l, `display_unit`),
       frazioni comuni come frazione (1/2, 1/4), il resto arrotondato (con test)
 - [x] Incolla lista ingredienti (una riga = un ingrediente, stesso parser)
-- [ ] Lista ricette + dettaglio
+- [x] Lista ricette + dettaglio
 - [ ] Tag: creazione con colore/emoji, assegnazione multipla
 - [ ] Filtro lista per uno o più tag
 - [ ] Preferiti
 - [ ] Eliminazione con "Annulla" (toast) invece di conferma
 - [ ] Bozza ricetta salvata automaticamente
-- [ ] Tema scuro automatico (`prefers-color-scheme`)
+- [x] Tema scuro automatico (`prefers-color-scheme`)
 - [ ] Layout mobile: navigazione in basso, azioni principali a portata di pollice
-- [ ] Stato vuoto curato ("Crea la tua prima ricetta")
+- [x] Stato vuoto curato ("Crea la tua prima ricetta")
 
 ### Fase 2 — Ricerca
 - [ ] Ricerca per nome (FTS5, insensibile agli accenti)
@@ -157,10 +160,10 @@ CREATE VIRTUAL TABLE recipe_fts USING fts5(
 ## CI/CD (GitHub Actions)
 
 ### CI — ogni push e pull request (Fase 0)
-- [ ] Un job su Ubuntu: `svelte-check`, test frontend (Vitest: parser quantità, formattazione,
+- [x] Un job su Ubuntu: `svelte-check`, test frontend (Vitest: parser quantità, formattazione,
       confronto frigo), `cargo fmt --check`, `cargo clippy`, `cargo test`
-- [ ] Cache di npm e cargo
-- [ ] Niente build completa dei pacchetti in CI: troppo lenta, la fa il release
+- [x] Cache di npm e cargo
+- [x] Niente build completa dei pacchetti in CI: troppo lenta, la fa il release
 
 ### Release — al push di un tag `v*`
 - [ ] Desktop con `tauri-apps/tauri-action`, matrice di runner, tutto allegato a una GitHub
