@@ -1,13 +1,8 @@
 import { DatabaseSync } from "node:sqlite";
-import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
+import { testDb } from "./test-db";
 
-function freshDb() {
-  const db = new DatabaseSync(":memory:");
-  db.exec("PRAGMA foreign_keys = ON");
-  db.exec(readFileSync("src-tauri/migrations/001_init.sql", "utf8"));
-  return db;
-}
+const freshDb = () => testDb().raw;
 
 function addRecipe(db: DatabaseSync, id: string, name: string) {
   db.prepare(

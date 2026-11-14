@@ -107,7 +107,7 @@ CREATE VIRTUAL TABLE recipe_fts USING fts5(
 - [x] Repo git + CI di base (vedi sezione CI/CD)
 
 ### Fase 1 — Ricette e organizzazione
-- [ ] CRUD ricette (nome, porzioni, procedimento, volume bicchiere opzionale)
+- [x] CRUD ricette (nome, porzioni, procedimento, volume bicchiere opzionale)
 - [ ] Editor ingredienti: autocomplete su ingredienti esistenti, quantità frazionaria, unità da menu
 - [ ] Inserimento ingrediente in una riga: `30 g zucchero`, `1/4 parte malibu`, `1 limone`, `sale qb`
       → quantità + unità + ingrediente, convertito in unità base (parser con test)
