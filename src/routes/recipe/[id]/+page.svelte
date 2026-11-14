@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { getDb } from "$lib/db";
+  import { formatLine } from "$lib/ingredients";
   import { deleteRecipe } from "$lib/recipes";
 
   let { data } = $props();
@@ -32,7 +33,21 @@
 
   {#if meta}<p class="meta">{meta}</p>{/if}
 
+  {#if data.ingredients.length}
+    <h2>Ingredienti</h2>
+    <ul class="ingredients">
+      {#each data.ingredients as line, i (i)}
+        <li>
+          {formatLine(line)}
+          {#if line.note}<span class="muted">({line.note})</span>{/if}
+          {#if line.optional}<span class="muted">· facoltativo</span>{/if}
+        </li>
+      {/each}
+    </ul>
+  {/if}
+
   {#if data.recipe.instructions}
+    <h2>Procedimento</h2>
     <p class="instructions">{data.recipe.instructions}</p>
   {/if}
 
@@ -45,8 +60,15 @@
 </main>
 
 <style>
-  .meta {
+  .meta,
+  .muted {
     color: var(--muted);
+  }
+  h2 {
+    font-size: 1.1rem;
+  }
+  .ingredients {
+    padding-left: 1.2rem;
   }
   .instructions {
     white-space: pre-wrap;

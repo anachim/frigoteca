@@ -2,15 +2,20 @@
   import { goto } from "$app/navigation";
   import RecipeForm from "$lib/RecipeForm.svelte";
   import { getDb } from "$lib/db";
+  import { saveIngredients, type IngredientLine } from "$lib/ingredients";
   import { createRecipe, type RecipeInput } from "$lib/recipes";
 
-  async function save(input: RecipeInput) {
-    const id = await createRecipe(await getDb(), input);
+  let { data } = $props();
+
+  async function save(input: RecipeInput, ingredients: IngredientLine[]) {
+    const db = await getDb();
+    const id = await createRecipe(db, input);
+    await saveIngredients(db, id, ingredients);
     await goto(`/recipe/${id}`, { replaceState: true });
   }
 </script>
 
 <main>
   <h1>Nuova ricetta</h1>
-  <RecipeForm onsave={save} cancelHref="/" />
+  <RecipeForm ingredientNames={data.ingredientNames} onsave={save} cancelHref="/" />
 </main>

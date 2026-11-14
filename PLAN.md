@@ -108,7 +108,7 @@ CREATE VIRTUAL TABLE recipe_fts USING fts5(
 
 ### Fase 1 — Ricette e organizzazione
 - [x] CRUD ricette (nome, porzioni, procedimento, volume bicchiere opzionale)
-- [ ] Editor ingredienti: autocomplete su ingredienti esistenti, quantità frazionaria, unità da menu
+- [x] Editor ingredienti: autocomplete su ingredienti esistenti, quantità frazionaria, unità da menu
 - [ ] Inserimento ingrediente in una riga: `30 g zucchero`, `1/4 parte malibu`, `1 limone`, `sale qb`
       → quantità + unità + ingrediente, convertito in unità base (parser con test)
 - [ ] Formattazione quantità per la UI: unità base → unità leggibile (g/kg, ml/l, `display_unit`),

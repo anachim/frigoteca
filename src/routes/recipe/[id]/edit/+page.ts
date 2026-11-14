@@ -1,9 +1,15 @@
 import { error } from "@sveltejs/kit";
 import { getDb } from "$lib/db";
+import { getIngredients, listIngredientNames } from "$lib/ingredients";
 import { getRecipe } from "$lib/recipes";
 
 export async function load({ params }) {
-  const recipe = await getRecipe(await getDb(), params.id);
+  const db = await getDb();
+  const recipe = await getRecipe(db, params.id);
   if (!recipe) error(404, "Ricetta non trovata");
-  return { recipe };
+  return {
+    recipe,
+    ingredients: await getIngredients(db, params.id),
+    ingredientNames: await listIngredientNames(db),
+  };
 }
