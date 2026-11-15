@@ -146,7 +146,7 @@ L'avanzamento dei punti aperti è tracciato nelle
 
 ### Fase 3 — Comodità
 - [x] Porzioni con +/− nel dettaglio ricetta (frazioni esatte)
-- [ ] Cocktail: calcolo ml per ingrediente da `parte` + volume bicchiere
+- [x] Cocktail: calcolo ml per ingrediente da `parte` + volume bicchiere
 - [ ] Modalità cucina: testo grande, schermo sempre acceso (Wake Lock API — verificare su
       WebView Android e WebView2), passi numerati, ingredienti e passi da spuntare
 - [ ] Lista della spesa: "aggiungi mancanti" dalla ricerca frigo con le quantità mancanti

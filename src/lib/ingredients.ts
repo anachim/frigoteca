@@ -1,4 +1,4 @@
-import { fraction, multiply, type Fraction } from "./fraction";
+import { add, divide, fraction, multiply, type Fraction } from "./fraction";
 import type { Db } from "./recipes";
 import { formatQuantity, isUnit, readableUnit, toReadable, UNITS, unitLabel, type Unit } from "./units";
 
@@ -111,4 +111,15 @@ export function scaleLine(line: IngredientLine, factor: Fraction): IngredientLin
   const scaled = multiply(line.qty, factor.num, factor.den);
   if ("remember" in info || info.base === "parte" || info.base === "pz") return { ...line, qty: scaled };
   return { ...line, ...toReadable(multiply(scaled, info.factor), info.base) };
+}
+
+/**
+ * For cocktails: the ml of each line given in parts, for a glass of glassMl. 1/4 + 3/4 parts in a
+ * 200 ml glass give 50 ml and 150 ml; parts as counts (1 + 3) give the same. Other lines get null.
+ */
+export function partsToMl(lines: IngredientLine[], glassMl: Fraction): (Fraction | null)[] {
+  const total = lines.reduce((sum, l) => (l.unit === "parte" && l.qty ? add(sum, l.qty) : sum), fraction(0));
+  return lines.map((l) =>
+    l.unit === "parte" && l.qty && total.num > 0 ? multiply(divide(l.qty, total), glassMl.num, glassMl.den) : null,
+  );
 }

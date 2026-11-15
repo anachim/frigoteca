@@ -1,8 +1,9 @@
 <script lang="ts">
   import { goto, invalidateAll } from "$app/navigation";
   import { getDb } from "$lib/db";
-  import { fraction } from "$lib/fraction";
-  import { formatLine, scaleLine } from "$lib/ingredients";
+  import { fraction, multiply, type Fraction } from "$lib/fraction";
+  import { formatLine, partsToMl, scaleLine } from "$lib/ingredients";
+  import { formatQuantity, toReadable } from "$lib/units";
   import { pendingDelete } from "$lib/pending-delete.svelte";
   import { deleteRecipe, setFavorite } from "$lib/recipes";
   import TagChip from "$lib/TagChip.svelte";
@@ -27,11 +28,16 @@
 
   // svelte-ignore state_referenced_locally
   let servings = $state(data.recipe.servings);
-  const lines = $derived(
-    servings && data.recipe.servings
-      ? data.ingredients.map((l) => scaleLine(l, fraction(servings!, data.recipe.servings!)))
-      : data.ingredients,
+  const factor = $derived(servings && data.recipe.servings ? fraction(servings, data.recipe.servings) : fraction(1));
+  const lines = $derived(data.ingredients.map((l) => scaleLine(l, factor)));
+  // More servings means more glasses, so the ml per ingredient scale with them.
+  const partMl = $derived(
+    data.recipe.glassMl ? partsToMl(lines, multiply(factor, data.recipe.glassMl)) : lines.map(() => null),
   );
+  const formatMl = (ml: Fraction) => {
+    const { qty, unit } = toReadable(ml, "ml");
+    return `${formatQuantity(qty, unit)} ${unit}`;
+  };
 </script>
 
 <main>
@@ -73,6 +79,7 @@
       {#each lines as line, i (i)}
         <li>
           {formatLine(line)}
+          {#if partMl[i]}<strong class="ml">· {formatMl(partMl[i]!)}</strong>{/if}
           {#if line.note}<span class="muted">({line.note})</span>{/if}
           {#if line.optional}<span class="muted">· facoltativo</span>{/if}
         </li>

@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { fraction, formatFraction, parseQuantity } from "./fraction";
-import { formatLine, getIngredients, listIngredientNames, saveIngredients, scaleLine, toStored, type IngredientLine } from "./ingredients";
+import { formatLine, getIngredients, listIngredientNames, partsToMl, saveIngredients, scaleLine, toStored, type IngredientLine } from "./ingredients";
 import { parseLine } from "./parse-line";
 import { createRecipe } from "./recipes";
 import { formatQuantity, readableUnit } from "./units";
@@ -131,4 +131,14 @@ test("scaling re-picks a readable unit but keeps kitchen units", () => {
   expect(scale("1/4 parte gin", 2)).toBe("1/2 parte gin");
   expect(scale("sale qb", 3)).toBe("sale q.b.");
   expect(scale("basilico", 3)).toBe("basilico");
+});
+
+test("cocktail parts become ml for the glass size", () => {
+  const lines = ["1/4 parte malibu", "3/4 parte succo d'arancia", "ghiaccio"].map((l) => parseLine(l)!);
+  const ml = partsToMl(lines, fraction(200)).map((f) => f && formatQuantity(f, "ml"));
+  expect(ml).toEqual(["50", "150", null]);
+  const counts = ["1 parte gin", "1 parte vermouth", "1 parte bitter"].map((l) => parseLine(l)!);
+  expect(partsToMl(counts, fraction(90)).map((f) => f && formatQuantity(f, "ml"))).toEqual(["30", "30", "30"]);
+  expect(partsToMl([parseLine("1 parte gin")!], fraction(100))).toEqual([fraction(100)]);
+  expect(partsToMl([parseLine("50 ml gin")!], fraction(100))).toEqual([null]);
 });
