@@ -4,6 +4,7 @@
   import { putInFridge, removeFromFridge } from "$lib/fridge";
   import { ensureIngredient, formatLine, type IngredientLine } from "$lib/ingredients";
   import { setPantry } from "$lib/match";
+  import { describeLacking } from "$lib/results";
   import { parseLine, parseLines } from "$lib/parse-line";
 
   let { data } = $props();
@@ -93,6 +94,44 @@
     <p class="empty">Il frigo è vuoto. Scrivi cosa hai o tocca gli ingredienti qui sotto.</p>
   {/if}
 
+  {#if data.results.ready.length || data.results.almost.length}
+    <section aria-live="polite">
+      {#if data.results.ready.length}
+        <h2>Puoi farla ({data.results.ready.length})</h2>
+        <ul class="results">
+          {#each data.results.ready as r (r.recipe.id)}
+            <li>
+              <a href="/recipe/{r.recipe.id}">
+                <strong>{r.recipe.name}</strong>
+                {#if r.toCheck.length}
+                  <span class="check">⚠ verifica quantità: {r.toCheck.map((n) => n.name).join(", ")}</span>
+                {/if}
+              </a>
+            </li>
+          {/each}
+        </ul>
+      {/if}
+      {#if data.results.almost.length}
+        <h2>Quasi ({data.results.almost.length})</h2>
+        <ul class="results">
+          {#each data.results.almost as r (r.recipe.id)}
+            <li>
+              <a href="/recipe/{r.recipe.id}">
+                <strong>{r.recipe.name}</strong>
+                <span class="lacking">ti manca: {r.lacking.map(describeLacking).join(", ")}</span>
+                {#if r.toCheck.length}
+                  <span class="check">⚠ verifica quantità: {r.toCheck.map((n) => n.name).join(", ")}</span>
+                {/if}
+              </a>
+            </li>
+          {/each}
+        </ul>
+      {/if}
+    </section>
+  {:else if data.items.length}
+    <p class="empty">Nessuna ricetta usa ancora questi ingredienti.</p>
+  {/if}
+
   {#if suggestions.length}
     <h2>Aggiungi al volo</h2>
     <div class="chips">
@@ -159,6 +198,30 @@
   .items .remove {
     padding: 0.6rem 0.9rem 0.6rem 0.4rem;
     color: var(--muted);
+  }
+  .results {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .results a {
+    display: grid;
+    gap: 0.2rem;
+    padding: 0.8rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    color: inherit;
+    text-decoration: none;
+  }
+  .lacking {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .check {
+    color: var(--accent);
+    font-size: 0.85rem;
   }
   .chips {
     display: flex;

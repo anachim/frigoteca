@@ -1,4 +1,4 @@
-import { formatFraction, type Fraction } from "./fraction";
+import { formatFraction, fraction, type Fraction } from "./fraction";
 
 export type BaseUnit = "g" | "ml" | "pz" | "parte" | "qb";
 
@@ -50,4 +50,11 @@ export function formatQuantity(qty: Fraction, unit: Unit | null): string {
   const digits = unit ? METRIC_DIGITS[unit] : undefined;
   if (digits === undefined && COMMON_DENOMINATORS.includes(qty.den)) return formatFraction(qty);
   return (qty.num / qty.den).toLocaleString("it-IT", { maximumFractionDigits: digits ?? 2, useGrouping: false });
+}
+
+/** A quantity stored in a base unit, converted to the unit that reads best. */
+export function toReadable(qty: Fraction, base: Unit): { qty: Fraction; unit: Unit } {
+  const unit = readableUnit(qty, base);
+  const f = UNITS[unit].factor;
+  return { qty: fraction(qty.num, qty.den * f), unit };
 }

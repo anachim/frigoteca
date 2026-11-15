@@ -138,9 +138,9 @@ L'avanzamento dei punti aperti è tracciato nelle
   - **da verificare**: presente senza quantità, o unità non confrontabili (g vs ml, pz vs g)
   - **mancante**: non presente
   - `parte` (cocktail): confrontabile solo se la ricetta ha `glass_ml`, altrimenti solo presenza
-- [ ] Risultati in gruppi: "Puoi farla" / "Quasi" (insufficienti o mancanti, ordinati per quanti) /
+- [x] Risultati in gruppi: "Puoi farla" / "Quasi" (insufficienti o mancanti, ordinati per quanti) /
       con badge "verifica quantità" dove serve; risultati aggiornati a ogni modifica del frigo
-- [ ] Sotto ogni risultato: "ti manca: 2 uova, 50 g pecorino"
+- [x] Sotto ogni risultato: "ti manca: 2 uova, 50 g pecorino"
 - [ ] "Ti basta per N porzioni": minimo tra disponibile/richiesto sugli ingredienti confrontabili
 - [ ] Ricerca frigo combinabile con filtro tag
 
