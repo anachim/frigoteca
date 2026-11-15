@@ -58,16 +58,19 @@ export async function listIngredientNames(db: Db): Promise<string[]> {
   return rows.map((r) => r.name);
 }
 
+/** Id of the ingredient with this name (case-insensitive), created if missing. */
+export async function ensureIngredient(db: Db, name: string): Promise<number> {
+  await db.execute("INSERT INTO ingredient (name) VALUES (?) ON CONFLICT (name) DO NOTHING", [name]);
+  const [row] = await db.select<{ id: number }[]>("SELECT id FROM ingredient WHERE name = ?", [name]);
+  return row.id;
+}
+
 /** Replaces all ingredient lines of a recipe; blank names are skipped. */
 export async function saveIngredients(db: Db, recipeId: string, lines: IngredientLine[]): Promise<void> {
   const kept = lines.map((l) => ({ ...l, name: l.name.trim(), note: l.note.trim() })).filter((l) => l.name);
 
   const ids = new Map<string, number>();
-  for (const name of new Set(kept.map((l) => l.name))) {
-    await db.execute("INSERT INTO ingredient (name) VALUES (?) ON CONFLICT (name) DO NOTHING", [name]);
-    const [row] = await db.select<{ id: number }[]>("SELECT id FROM ingredient WHERE name = ?", [name]);
-    ids.set(name, row.id);
-  }
+  for (const name of new Set(kept.map((l) => l.name))) ids.set(name, await ensureIngredient(db, name));
 
   // The SQL plugin pools connections, so BEGIN/COMMIT across calls is unreliable. Instead the new
   // lines go in with one multi-row INSERT, then only rows older than that are deleted: an

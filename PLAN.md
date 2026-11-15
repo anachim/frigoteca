@@ -129,7 +129,7 @@ L'avanzamento dei punti aperti è tracciato nelle
 
 ### Fase 2 — Ricerca
 - [x] Ricerca per nome (FTS5, insensibile agli accenti)
-- [ ] Frigo persistente (`fridge_item`): chip grandi da toccare, più usati in alto, quantità
+- [x] Frigo persistente (`fridge_item`): chip grandi da toccare, più usati in alto, quantità
       facoltativa con lo stesso parser a riga (`500 g farina`, `6 uova`)
 - [ ] Confronto diretto in unità base (stessa unità = confrontabile, nessuna conversione)
 - [ ] Confronto ricetta vs frigo per ogni ingrediente (esclusi opzionali e "dispensa"):

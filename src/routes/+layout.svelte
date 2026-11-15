@@ -6,6 +6,7 @@
 
   const sections = [
     { href: "/", label: "Ricette", icon: "📖" },
+    { href: "/fridge", label: "Frigo", icon: "🧊" },
     { href: "/recipe/new", label: "Nuova", icon: "➕" },
     { href: "/tags", label: "Tag", icon: "🏷️" },
   ];
