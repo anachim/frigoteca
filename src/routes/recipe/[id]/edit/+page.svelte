@@ -25,6 +25,7 @@
     ingredientNames={data.ingredientNames}
     initialTags={data.tags}
     allTags={data.allTags}
+    draftKey="edit:{data.recipe.id}"
     onsave={save}
     cancelHref="/recipe/{data.recipe.id}"
   />

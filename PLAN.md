@@ -122,7 +122,7 @@ L'avanzamento dei punti aperti è tracciato nelle
 - [x] Filtro lista per uno o più tag
 - [x] Preferiti
 - [x] Eliminazione con "Annulla" (toast) invece di conferma
-- [ ] Bozza ricetta salvata automaticamente
+- [x] Bozza ricetta salvata automaticamente
 - [x] Tema scuro automatico (`prefers-color-scheme`)
 - [ ] Layout mobile: navigazione in basso, azioni principali a portata di pollice
 - [x] Stato vuoto curato ("Crea la tua prima ricetta")

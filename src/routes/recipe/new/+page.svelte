@@ -19,5 +19,5 @@
 
 <main>
   <h1>Nuova ricetta</h1>
-  <RecipeForm ingredientNames={data.ingredientNames} allTags={data.allTags} onsave={save} cancelHref="/" />
+  <RecipeForm ingredientNames={data.ingredientNames} allTags={data.allTags} draftKey="new" onsave={save} cancelHref="/" />
 </main>
