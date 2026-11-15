@@ -1,7 +1,8 @@
 <script lang="ts">
   import { goto, invalidateAll } from "$app/navigation";
   import { getDb } from "$lib/db";
-  import { formatLine } from "$lib/ingredients";
+  import { fraction } from "$lib/fraction";
+  import { formatLine, scaleLine } from "$lib/ingredients";
   import { pendingDelete } from "$lib/pending-delete.svelte";
   import { deleteRecipe, setFavorite } from "$lib/recipes";
   import TagChip from "$lib/TagChip.svelte";
@@ -24,13 +25,12 @@
     await goto("/", { replaceState: true });
   }
 
-  const meta = $derived(
-    [
-      data.recipe.servings && `${data.recipe.servings} porzioni`,
-      data.recipe.glassMl && `bicchiere da ${data.recipe.glassMl} ml`,
-    ]
-      .filter(Boolean)
-      .join(" · "),
+  // svelte-ignore state_referenced_locally
+  let servings = $state(data.recipe.servings);
+  const lines = $derived(
+    servings && data.recipe.servings
+      ? data.ingredients.map((l) => scaleLine(l, fraction(servings!, data.recipe.servings!)))
+      : data.ingredients,
   );
 </script>
 
@@ -48,7 +48,18 @@
     </button>
   </div>
 
-  {#if meta}<p class="meta">{meta}</p>{/if}
+  {#if servings || data.recipe.glassMl}
+    <div class="meta">
+      {#if servings}
+        <span class="stepper" role="group" aria-label="Porzioni">
+          <button onclick={() => (servings = Math.max(1, servings! - 1))} disabled={servings <= 1} aria-label="Meno porzioni">−</button>
+          <span aria-live="polite">{servings} {servings === 1 ? "porzione" : "porzioni"}</span>
+          <button onclick={() => (servings = servings! + 1)} aria-label="Più porzioni">+</button>
+        </span>
+      {/if}
+      {#if data.recipe.glassMl}<span>bicchiere da {data.recipe.glassMl} ml</span>{/if}
+    </div>
+  {/if}
 
   {#if data.tags.length}
     <div class="tags">
@@ -59,7 +70,7 @@
   {#if data.ingredients.length}
     <h2>Ingredienti</h2>
     <ul class="ingredients">
-      {#each data.ingredients as line, i (i)}
+      {#each lines as line, i (i)}
         <li>
           {formatLine(line)}
           {#if line.note}<span class="muted">({line.note})</span>{/if}
@@ -86,6 +97,26 @@
   .meta,
   .muted {
     color: var(--muted);
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    margin: 0.5rem 0 1rem;
+  }
+  .stepper {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text);
+  }
+  .stepper button {
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    font-size: 1.2rem;
+    border-radius: 999px;
   }
   h2 {
     font-size: 1.1rem;

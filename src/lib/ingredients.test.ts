@@ -1,6 +1,7 @@
 import { expect, test } from "vitest";
 import { fraction, formatFraction, parseQuantity } from "./fraction";
-import { formatLine, getIngredients, listIngredientNames, saveIngredients, toStored, type IngredientLine } from "./ingredients";
+import { formatLine, getIngredients, listIngredientNames, saveIngredients, scaleLine, toStored, type IngredientLine } from "./ingredients";
+import { parseLine } from "./parse-line";
 import { createRecipe } from "./recipes";
 import { formatQuantity, readableUnit } from "./units";
 import { testDb } from "./test-db";
@@ -117,4 +118,17 @@ test("stored quantities read back in a readable unit", async () => {
     "1,25 l Acqua",
     "4 cl Gin",
   ]);
+});
+
+test("scaling re-picks a readable unit but keeps kitchen units", () => {
+  const scale = (text: string, num: number, den = 1) => formatLine(scaleLine(parseLine(text)!, fraction(num, den)));
+  expect(scale("800 g farina", 2)).toBe("1,6 kg farina");
+  expect(scale("1 kg farina", 1, 4)).toBe("250 g farina");
+  expect(scale("750 ml latte", 2)).toBe("1,5 l latte");
+  expect(scale("2 cucchiai olio", 3, 2)).toBe("3 cucchiai olio");
+  expect(scale("4 uova", 3, 4)).toBe("3 uova");
+  expect(scale("1 limone", 1, 2)).toBe("1/2 limone");
+  expect(scale("1/4 parte gin", 2)).toBe("1/2 parte gin");
+  expect(scale("sale qb", 3)).toBe("sale q.b.");
+  expect(scale("basilico", 3)).toBe("basilico");
 });

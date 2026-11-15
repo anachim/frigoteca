@@ -1,6 +1,6 @@
 import { fraction, multiply, type Fraction } from "./fraction";
 import type { Db } from "./recipes";
-import { formatQuantity, isUnit, readableUnit, UNITS, unitLabel, type Unit } from "./units";
+import { formatQuantity, isUnit, readableUnit, toReadable, UNITS, unitLabel, type Unit } from "./units";
 
 /** One ingredient line as the user sees it: quantity in the unit they chose. */
 export interface IngredientLine {
@@ -102,4 +102,13 @@ export function formatLine(line: IngredientLine): string {
   const plural = line.qty.num > line.qty.den;
   const unit = line.unit ? unitLabel(line.unit, plural) : "";
   return [formatQuantity(line.qty, line.unit), unit, line.name].filter(Boolean).join(" ");
+}
+
+/** Multiplies a line's quantity (e.g. for more servings), re-picking the readable unit: 800 g × 2 reads 1,6 kg. */
+export function scaleLine(line: IngredientLine, factor: Fraction): IngredientLine {
+  if (!line.qty || !line.unit) return line.qty ? { ...line, qty: multiply(line.qty, factor.num, factor.den) } : line;
+  const info = UNITS[line.unit];
+  const scaled = multiply(line.qty, factor.num, factor.den);
+  if ("remember" in info || info.base === "parte" || info.base === "pz") return { ...line, qty: scaled };
+  return { ...line, ...toReadable(multiply(scaled, info.factor), info.base) };
 }

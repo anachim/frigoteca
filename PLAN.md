@@ -145,7 +145,7 @@ L'avanzamento dei punti aperti è tracciato nelle
 - [x] Ricerca frigo combinabile con filtro tag
 
 ### Fase 3 — Comodità
-- [ ] Porzioni con +/− nel dettaglio ricetta (frazioni esatte)
+- [x] Porzioni con +/− nel dettaglio ricetta (frazioni esatte)
 - [ ] Cocktail: calcolo ml per ingrediente da `parte` + volume bicchiere
 - [ ] Modalità cucina: testo grande, schermo sempre acceso (Wake Lock API — verificare su
       WebView Android e WebView2), passi numerati, ingredienti e passi da spuntare
