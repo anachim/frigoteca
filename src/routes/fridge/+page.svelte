@@ -2,7 +2,8 @@
   import { invalidateAll } from "$app/navigation";
   import { getDb } from "$lib/db";
   import { putInFridge, removeFromFridge } from "$lib/fridge";
-  import { formatLine, type IngredientLine } from "$lib/ingredients";
+  import { ensureIngredient, formatLine, type IngredientLine } from "$lib/ingredients";
+  import { setPantry } from "$lib/match";
   import { parseLine, parseLines } from "$lib/parse-line";
 
   let { data } = $props();
@@ -11,7 +12,25 @@
   let input: HTMLInputElement;
 
   const inFridge = $derived(new Set(data.items.map((i) => i.ingredientId)));
-  const suggestions = $derived(data.ingredients.filter((i) => !inFridge.has(i.id)));
+  const suggestions = $derived(data.ingredients.filter((i) => !inFridge.has(i.id) && !i.pantry));
+  const pantry = $derived(data.ingredients.filter((i) => i.pantry));
+  let pantryText = $state("");
+
+  async function pantryKey(event: KeyboardEvent) {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    const name = pantryText.trim();
+    if (!name) return;
+    pantryText = "";
+    const db = await getDb();
+    await setPantry(db, await ensureIngredient(db, name), true);
+    await invalidateAll();
+  }
+
+  async function unpantry(id: number) {
+    await setPantry(await getDb(), id, false);
+    await invalidateAll();
+  }
 
   async function put(lines: IngredientLine[]) {
     const db = await getDb();
@@ -84,6 +103,20 @@
       {/each}
     </div>
   {/if}
+
+  <h2>Sempre in dispensa</h2>
+  <p class="hint">Sale, olio, acqua… non contano mai come mancanti nella ricerca.</p>
+  {#if pantry.length}
+    <ul class="items pantry">
+      {#each pantry as ing (ing.id)}
+        <li>
+          <span class="item">{ing.name}</span>
+          <button class="remove" onclick={() => unpantry(ing.id)} aria-label="Togli {ing.name} dalla dispensa">✕</button>
+        </li>
+      {/each}
+    </ul>
+  {/if}
+  <input bind:value={pantryText} onkeydown={pantryKey} placeholder="Aggiungi e premi Invio (es. sale)" aria-label="Aggiungi alla dispensa" autocomplete="off" />
 </main>
 
 <style>
@@ -115,6 +148,13 @@
     border-radius: 0;
     background: transparent;
     padding: 0.6rem 0.4rem 0.6rem 1rem;
+  }
+  .items .item {
+    padding: 0.6rem 0.4rem 0.6rem 1rem;
+  }
+  .pantry li {
+    border-color: var(--border);
+    background: var(--surface);
   }
   .items .remove {
     padding: 0.6rem 0.9rem 0.6rem 0.4rem;

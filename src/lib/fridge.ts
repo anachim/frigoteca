@@ -13,6 +13,7 @@ export interface IngredientUse {
   id: number;
   name: string;
   uses: number;
+  pantry: number;
 }
 
 interface Row {
@@ -42,7 +43,7 @@ export async function listFridge(db: Db): Promise<FridgeItem[]> {
 /** All known ingredients, the ones used by more recipes first. */
 export const ingredientsByUse = (db: Db) =>
   db.select<IngredientUse[]>(
-    `SELECT i.id, i.name, COUNT(DISTINCT ri.recipe_id) AS uses
+    `SELECT i.id, i.name, i.pantry, COUNT(DISTINCT ri.recipe_id) AS uses
      FROM ingredient i LEFT JOIN recipe_ingredient ri ON ri.ingredient_id = i.id
      GROUP BY i.id ORDER BY uses DESC, i.name COLLATE NOCASE`,
   );

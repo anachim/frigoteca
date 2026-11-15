@@ -36,3 +36,9 @@ export function formatFraction({ num, den }: Fraction): string {
   const rest = `${num % den}/${den}`;
   return whole > 0 ? `${whole} ${rest}` : rest;
 }
+
+export const add = (a: Fraction, b: Fraction): Fraction => fraction(a.num * b.den + b.num * a.den, a.den * b.den);
+export const subtract = (a: Fraction, b: Fraction): Fraction => fraction(a.num * b.den - b.num * a.den, a.den * b.den);
+export const divide = (a: Fraction, b: Fraction): Fraction => fraction(a.num * b.den, a.den * b.num);
+/** Negative when a < b, zero when equal, positive when a > b. */
+export const compare = (a: Fraction, b: Fraction): number => a.num * b.den - b.num * a.den;
