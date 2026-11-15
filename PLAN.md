@@ -121,7 +121,7 @@ L'avanzamento dei punti aperti è tracciato nelle
 - [x] Tag: creazione con colore/emoji, assegnazione multipla
 - [x] Filtro lista per uno o più tag
 - [x] Preferiti
-- [ ] Eliminazione con "Annulla" (toast) invece di conferma
+- [x] Eliminazione con "Annulla" (toast) invece di conferma
 - [ ] Bozza ricetta salvata automaticamente
 - [x] Tema scuro automatico (`prefers-color-scheme`)
 - [ ] Layout mobile: navigazione in basso, azioni principali a portata di pollice

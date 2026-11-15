@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { goto } from "$app/navigation";
+  import { goto, invalidateAll } from "$app/navigation";
   import { getDb } from "$lib/db";
   import { formatLine } from "$lib/ingredients";
+  import { pendingDelete } from "$lib/pending-delete.svelte";
   import { deleteRecipe, setFavorite } from "$lib/recipes";
   import TagChip from "$lib/TagChip.svelte";
 
   let { data } = $props();
-  let confirming = $state(false);
   // svelte-ignore state_referenced_locally
   let favorite = $state(data.recipe.favorite);
 
@@ -15,13 +15,12 @@
     await setFavorite(await getDb(), data.recipe.id, favorite);
   }
 
-  // ponytail: two-tap delete; replaced by the undo toast planned in Phase 1.
   async function remove() {
-    if (!confirming) {
-      confirming = true;
-      return;
-    }
-    await deleteRecipe(await getDb(), data.recipe.id);
+    const { id, name } = data.recipe;
+    await pendingDelete.schedule(id, name, async () => {
+      await deleteRecipe(await getDb(), id);
+      await invalidateAll();
+    });
     await goto("/", { replaceState: true });
   }
 
@@ -76,8 +75,8 @@
   {/if}
 
   <div class="actions">
-    <button class="danger" onclick={remove} onblur={() => (confirming = false)}>
-      {confirming ? "Conferma eliminazione" : "Elimina"}
+    <button class="danger" onclick={remove}>
+      Elimina
     </button>
     <a class="button primary" href="/recipe/{data.recipe.id}/edit">Modifica</a>
   </div>

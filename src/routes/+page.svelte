@@ -2,12 +2,14 @@
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import { filterFromUrl, filterRecipes, filterToUrl, type RecipeFilter } from "$lib/filter";
+  import { pendingDelete } from "$lib/pending-delete.svelte";
   import TagChip from "$lib/TagChip.svelte";
 
   let { data } = $props();
 
   const filter = $derived(filterFromUrl(page.url.searchParams));
-  const shown = $derived(filterRecipes(data.recipes, data.tags, filter));
+  const recipes = $derived(data.recipes.filter((r) => r.id !== pendingDelete.current?.id));
+  const shown = $derived(filterRecipes(recipes, data.tags, filter));
   const filtering = $derived(filter.favoritesOnly || filter.tagIds.length > 0);
 
   function setFilter(next: RecipeFilter) {
@@ -29,7 +31,7 @@
     </nav>
   </header>
 
-  {#if data.recipes.length === 0}
+  {#if recipes.length === 0}
     <p class="empty">Nessuna ricetta ancora. <a href="/recipe/new">Crea la tua prima ricetta</a></p>
   {:else}
     <div class="filters" role="group" aria-label="Filtri">
@@ -63,7 +65,7 @@
           </li>
         {/each}
       </ul>
-      {#if filtering}<p class="count">{shown.length} di {data.recipes.length} ricette</p>{/if}
+      {#if filtering}<p class="count">{shown.length} di {recipes.length} ricette</p>{/if}
     {/if}
   {/if}
 </main>

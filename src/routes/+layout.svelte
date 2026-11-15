@@ -1,8 +1,19 @@
 <script lang="ts">
+  import { pendingDelete } from "$lib/pending-delete.svelte";
+
   let { children } = $props();
 </script>
 
 {@render children()}
+
+<div class="toast-area" role="status" aria-live="polite">
+  {#if pendingDelete.current}
+    <div class="toast">
+      <span>«{pendingDelete.current.name}» eliminata</span>
+      <button onclick={() => pendingDelete.undo()}>Annulla</button>
+    </div>
+  {/if}
+</div>
 
 <style>
   :global(:root) {
@@ -62,5 +73,31 @@
   }
   :global([role="alert"]) {
     color: var(--danger);
+  }
+  .toast-area {
+    position: fixed;
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0.5rem 0.5rem 1rem;
+    border-radius: 0.75rem;
+    background: var(--text);
+    color: var(--bg);
+    box-shadow: 0 4px 16px rgb(0 0 0 / 0.25);
+  }
+  .toast button {
+    background: transparent;
+    border-color: transparent;
+    color: var(--accent);
+    font-weight: 600;
   }
 </style>
