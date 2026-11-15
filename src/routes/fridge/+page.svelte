@@ -5,6 +5,16 @@
   import { ensureIngredient, formatLine, type IngredientLine } from "$lib/ingredients";
   import { setPantry } from "$lib/match";
   import { describeLacking } from "$lib/results";
+  import type { Need } from "$lib/match";
+  import { addLacking } from "$lib/shopping";
+  import { SvelteSet } from "svelte/reactivity";
+
+  const added = new SvelteSet<string>();
+
+  async function toShopping(recipeId: string, lacking: Need[]) {
+    await addLacking(await getDb(), lacking);
+    added.add(recipeId);
+  }
   import { page } from "$app/state";
   import { filterFromUrl, filterToUrl } from "$lib/filter";
   import TagChip from "$lib/TagChip.svelte";
@@ -145,6 +155,9 @@
                   <span class="check">⚠ verifica quantità: {r.toCheck.map((n) => n.name).join(", ")}</span>
                 {/if}
               </a>
+              <button class="to-shopping" onclick={() => toShopping(r.recipe.id, r.lacking)} disabled={added.has(r.recipe.id)}>
+                {added.has(r.recipe.id) ? "✓ Nella lista della spesa" : "🛒 Aggiungi i mancanti alla spesa"}
+              </button>
             </li>
           {/each}
         </ul>
@@ -241,6 +254,11 @@
     border-radius: 0.5rem;
     color: inherit;
     text-decoration: none;
+  }
+  .to-shopping {
+    margin-top: 0.3rem;
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
   }
   .lacking {
     color: var(--muted);

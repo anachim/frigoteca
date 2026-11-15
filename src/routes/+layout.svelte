@@ -7,6 +7,7 @@
   const sections = [
     { href: "/", label: "Ricette", icon: "📖" },
     { href: "/fridge", label: "Frigo", icon: "🧊" },
+    { href: "/shopping", label: "Spesa", icon: "🛒" },
     { href: "/recipe/new", label: "Nuova", icon: "➕" },
     { href: "/tags", label: "Tag", icon: "🏷️" },
   ];
@@ -138,7 +139,7 @@
       flex-direction: column;
       gap: 0;
       font-size: 0.8rem;
-      padding: 0.25rem 1rem;
+      padding: 0.25rem 0.4rem;
     }
     .app-nav a span {
       font-size: 1.3rem;
