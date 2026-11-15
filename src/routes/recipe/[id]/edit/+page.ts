@@ -2,6 +2,7 @@ import { error } from "@sveltejs/kit";
 import { getDb } from "$lib/db";
 import { getIngredients, listIngredientNames } from "$lib/ingredients";
 import { getRecipe } from "$lib/recipes";
+import { getRecipeTags, listTags } from "$lib/tags";
 
 export async function load({ params }) {
   const db = await getDb();
@@ -11,5 +12,7 @@ export async function load({ params }) {
     recipe,
     ingredients: await getIngredients(db, params.id),
     ingredientNames: await listIngredientNames(db),
+    tags: (await getRecipeTags(db, params.id)).map((t) => t.name),
+    allTags: await listTags(db),
   };
 }

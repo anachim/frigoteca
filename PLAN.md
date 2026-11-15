@@ -118,7 +118,7 @@ L'avanzamento dei punti aperti è tracciato nelle
       frazioni comuni come frazione (1/2, 1/4), il resto arrotondato (con test)
 - [x] Incolla lista ingredienti (una riga = un ingrediente, stesso parser)
 - [x] Lista ricette + dettaglio
-- [ ] Tag: creazione con colore/emoji, assegnazione multipla
+- [x] Tag: creazione con colore/emoji, assegnazione multipla
 - [ ] Filtro lista per uno o più tag
 - [ ] Preferiti
 - [ ] Eliminazione con "Annulla" (toast) invece di conferma

@@ -1,6 +1,8 @@
 import { getDb } from "$lib/db";
 import { listIngredientNames } from "$lib/ingredients";
+import { listTags } from "$lib/tags";
 
 export async function load() {
-  return { ingredientNames: await listIngredientNames(await getDb()) };
+  const db = await getDb();
+  return { ingredientNames: await listIngredientNames(db), allTags: await listTags(db) };
 }

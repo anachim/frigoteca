@@ -3,6 +3,7 @@
   import { getDb } from "$lib/db";
   import { formatLine } from "$lib/ingredients";
   import { deleteRecipe } from "$lib/recipes";
+  import TagChip from "$lib/TagChip.svelte";
 
   let { data } = $props();
   let confirming = $state(false);
@@ -32,6 +33,12 @@
   <h1>{data.recipe.name}</h1>
 
   {#if meta}<p class="meta">{meta}</p>{/if}
+
+  {#if data.tags.length}
+    <div class="tags">
+      {#each data.tags as tag (tag.id)}<TagChip {tag} />{/each}
+    </div>
+  {/if}
 
   {#if data.ingredients.length}
     <h2>Ingredienti</h2>
@@ -66,6 +73,11 @@
   }
   h2 {
     font-size: 1.1rem;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
   }
   .ingredients {
     padding-left: 1.2rem;

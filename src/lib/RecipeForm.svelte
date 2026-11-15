@@ -2,18 +2,24 @@
   import IngredientEditor, { emptyDraft, fromDrafts, toDraft } from "$lib/IngredientEditor.svelte";
   import type { IngredientLine } from "$lib/ingredients";
   import { validateRecipe, type RecipeInput } from "$lib/recipes";
+  import TagPicker from "$lib/TagPicker.svelte";
+  import type { Tag } from "$lib/tags";
 
   let {
     initial = { name: "", servings: null, instructions: "", glassMl: null },
     initialIngredients = [],
+    initialTags = [],
+    allTags,
     ingredientNames,
     onsave,
     cancelHref,
   }: {
     initial?: RecipeInput;
     initialIngredients?: IngredientLine[];
+    initialTags?: string[];
+    allTags: Tag[];
     ingredientNames: string[];
-    onsave: (input: RecipeInput, ingredients: IngredientLine[]) => Promise<void>;
+    onsave: (input: RecipeInput, ingredients: IngredientLine[], tags: string[]) => Promise<void>;
     cancelHref: string;
   } = $props();
 
@@ -27,6 +33,8 @@
   });
   // svelte-ignore state_referenced_locally
   let drafts = $state(initialIngredients.length ? initialIngredients.map(toDraft) : [emptyDraft()]);
+  // svelte-ignore state_referenced_locally
+  let tags = $state([...initialTags]);
   let error = $state<string | null>(null);
   let saving = $state(false);
 
@@ -38,7 +46,7 @@
     if (error || typeof lines === "string") return;
     saving = true;
     try {
-      await onsave(input, lines);
+      await onsave(input, lines, tags);
     } catch (e) {
       error = e instanceof Error ? e.message : String(e);
     } finally {
@@ -64,6 +72,8 @@
   </div>
 
   <IngredientEditor bind:drafts names={ingredientNames} />
+
+  <TagPicker all={allTags} bind:selected={tags} />
 
   <label>
     Procedimento

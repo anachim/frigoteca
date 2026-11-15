@@ -4,13 +4,15 @@
   import { getDb } from "$lib/db";
   import { saveIngredients, type IngredientLine } from "$lib/ingredients";
   import { updateRecipe, type RecipeInput } from "$lib/recipes";
+  import { setRecipeTags } from "$lib/tags";
 
   let { data } = $props();
 
-  async function save(input: RecipeInput, ingredients: IngredientLine[]) {
+  async function save(input: RecipeInput, ingredients: IngredientLine[], tags: string[]) {
     const db = await getDb();
     await updateRecipe(db, data.recipe.id, input);
     await saveIngredients(db, data.recipe.id, ingredients);
+    await setRecipeTags(db, data.recipe.id, tags);
     await goto(`/recipe/${data.recipe.id}`, { replaceState: true });
   }
 </script>
@@ -21,6 +23,8 @@
     initial={data.recipe}
     initialIngredients={data.ingredients}
     ingredientNames={data.ingredientNames}
+    initialTags={data.tags}
+    allTags={data.allTags}
     onsave={save}
     cancelHref="/recipe/{data.recipe.id}"
   />
