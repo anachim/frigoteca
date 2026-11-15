@@ -119,8 +119,8 @@ L'avanzamento dei punti aperti è tracciato nelle
 - [x] Incolla lista ingredienti (una riga = un ingrediente, stesso parser)
 - [x] Lista ricette + dettaglio
 - [x] Tag: creazione con colore/emoji, assegnazione multipla
-- [ ] Filtro lista per uno o più tag
-- [ ] Preferiti
+- [x] Filtro lista per uno o più tag
+- [x] Preferiti
 - [ ] Eliminazione con "Annulla" (toast) invece di conferma
 - [ ] Bozza ricetta salvata automaticamente
 - [x] Tema scuro automatico (`prefers-color-scheme`)

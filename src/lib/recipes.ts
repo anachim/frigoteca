@@ -95,3 +95,7 @@ export async function updateRecipe(
 export async function deleteRecipe(db: Db, id: string): Promise<void> {
   await db.execute("DELETE FROM recipe WHERE id = ?", [id]);
 }
+
+export async function setFavorite(db: Db, id: string, favorite: boolean): Promise<void> {
+  await db.execute("UPDATE recipe SET favorite = ? WHERE id = ?", [favorite ? 1 : 0, id]);
+}

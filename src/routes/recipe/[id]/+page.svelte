@@ -2,11 +2,18 @@
   import { goto } from "$app/navigation";
   import { getDb } from "$lib/db";
   import { formatLine } from "$lib/ingredients";
-  import { deleteRecipe } from "$lib/recipes";
+  import { deleteRecipe, setFavorite } from "$lib/recipes";
   import TagChip from "$lib/TagChip.svelte";
 
   let { data } = $props();
   let confirming = $state(false);
+  // svelte-ignore state_referenced_locally
+  let favorite = $state(data.recipe.favorite);
+
+  async function toggleFavorite() {
+    favorite = !favorite;
+    await setFavorite(await getDb(), data.recipe.id, favorite);
+  }
 
   // ponytail: two-tap delete; replaced by the undo toast planned in Phase 1.
   async function remove() {
@@ -30,7 +37,17 @@
 
 <main>
   <a href="/">← Ricette</a>
-  <h1>{data.recipe.name}</h1>
+  <div class="title">
+    <h1>{data.recipe.name}</h1>
+    <button
+      class="star"
+      onclick={toggleFavorite}
+      aria-pressed={favorite}
+      aria-label={favorite ? "Togli dalle preferite" : "Aggiungi alle preferite"}
+    >
+      {favorite ? "⭐" : "☆"}
+    </button>
+  </div>
 
   {#if meta}<p class="meta">{meta}</p>{/if}
 
@@ -73,6 +90,17 @@
   }
   h2 {
     font-size: 1.1rem;
+  }
+  .title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .star {
+    font-size: 1.5rem;
+    line-height: 1;
+    padding: 0.4rem 0.6rem;
   }
   .tags {
     display: flex;

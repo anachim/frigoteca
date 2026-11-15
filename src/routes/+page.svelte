@@ -1,7 +1,23 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
+  import { page } from "$app/state";
+  import { filterFromUrl, filterRecipes, filterToUrl, type RecipeFilter } from "$lib/filter";
   import TagChip from "$lib/TagChip.svelte";
 
   let { data } = $props();
+
+  const filter = $derived(filterFromUrl(page.url.searchParams));
+  const shown = $derived(filterRecipes(data.recipes, data.tags, filter));
+  const filtering = $derived(filter.favoritesOnly || filter.tagIds.length > 0);
+
+  function setFilter(next: RecipeFilter) {
+    goto(filterToUrl(next) || "/", { replaceState: true, keepFocus: true, noScroll: true });
+  }
+
+  function toggleTag(id: number) {
+    const tagIds = filter.tagIds.includes(id) ? filter.tagIds.filter((t) => t !== id) : [...filter.tagIds, id];
+    setFilter({ ...filter, tagIds });
+  }
 </script>
 
 <main>
@@ -16,20 +32,39 @@
   {#if data.recipes.length === 0}
     <p class="empty">Nessuna ricetta ancora. <a href="/recipe/new">Crea la tua prima ricetta</a></p>
   {:else}
-    <ul>
-      {#each data.recipes as recipe (recipe.id)}
-        <li>
-          <a href="/recipe/{recipe.id}">
-            {recipe.name}
-            {#if data.tags.get(recipe.id)}
-              <span class="tags">
-                {#each data.tags.get(recipe.id) ?? [] as tag (tag.id)}<TagChip {tag} />{/each}
-              </span>
-            {/if}
-          </a>
-        </li>
+    <div class="filters" role="group" aria-label="Filtri">
+      <TagChip
+        tag={{ name: "Preferite", icon: "⭐", color: null }}
+        selected={filter.favoritesOnly}
+        onclick={() => setFilter({ ...filter, favoritesOnly: !filter.favoritesOnly })}
+      />
+      {#each data.allTags as tag (tag.id)}
+        <TagChip {tag} selected={filter.tagIds.includes(tag.id)} onclick={() => toggleTag(tag.id)} />
       {/each}
-    </ul>
+    </div>
+
+    {#if shown.length === 0}
+      <p class="empty">
+        Nessuna ricetta con questi filtri.
+        <button onclick={() => setFilter({ tagIds: [], favoritesOnly: false })}>Mostra tutte</button>
+      </p>
+    {:else}
+      <ul>
+        {#each shown as recipe (recipe.id)}
+          <li>
+            <a href="/recipe/{recipe.id}">
+              <span>{#if recipe.favorite}<span aria-label="preferita">⭐</span>{/if} {recipe.name}</span>
+              {#if data.tags.get(recipe.id)}
+                <span class="tags">
+                  {#each data.tags.get(recipe.id) ?? [] as tag (tag.id)}<TagChip {tag} />{/each}
+                </span>
+              {/if}
+            </a>
+          </li>
+        {/each}
+      </ul>
+      {#if filtering}<p class="count">{shown.length} di {data.recipes.length} ricette</p>{/if}
+    {/if}
   {/if}
 </main>
 
@@ -41,9 +76,15 @@
     gap: 1rem;
     flex-wrap: wrap;
   }
-  nav {
+  nav,
+  .filters {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.5rem;
+  }
+  .filters {
+    gap: 0.4rem;
+    margin-bottom: 1rem;
   }
   ul {
     list-style: none;
@@ -72,5 +113,9 @@
     color: var(--muted);
     text-align: center;
     padding: 3rem 0;
+  }
+  .count {
+    color: var(--muted);
+    text-align: center;
   }
 </style>
