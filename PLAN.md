@@ -128,7 +128,7 @@ L'avanzamento dei punti aperti è tracciato nelle
 - [x] Stato vuoto curato ("Crea la tua prima ricetta")
 
 ### Fase 2 — Ricerca
-- [ ] Ricerca per nome (FTS5, insensibile agli accenti)
+- [x] Ricerca per nome (FTS5, insensibile agli accenti)
 - [ ] Frigo persistente (`fridge_item`): chip grandi da toccare, più usati in alto, quantità
       facoltativa con lo stesso parser a riga (`500 g farina`, `6 uova`)
 - [ ] Confronto diretto in unità base (stessa unità = confrontabile, nessuna conversione)

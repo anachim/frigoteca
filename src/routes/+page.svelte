@@ -1,16 +1,19 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
-  import { filterFromUrl, filterRecipes, filterToUrl, type RecipeFilter } from "$lib/filter";
+  import { emptyFilter, filterFromUrl, filterRecipes, filterToUrl, type RecipeFilter } from "$lib/filter";
   import { pendingDelete } from "$lib/pending-delete.svelte";
   import TagChip from "$lib/TagChip.svelte";
 
   let { data } = $props();
 
   const filter = $derived(filterFromUrl(page.url.searchParams));
+  // The box keeps its own text: the URL updates a moment later and must not overwrite fast typing.
+  // svelte-ignore state_referenced_locally
+  let query = $state(filter.query);
   const recipes = $derived(data.recipes.filter((r) => r.id !== pendingDelete.current?.id));
-  const shown = $derived(filterRecipes(recipes, data.tags, filter));
-  const filtering = $derived(filter.favoritesOnly || filter.tagIds.length > 0);
+  const shown = $derived(filterRecipes(recipes, data.tags, filter, data.matches));
+  const filtering = $derived(filter.favoritesOnly || filter.tagIds.length > 0 || data.matches !== null);
 
   function setFilter(next: RecipeFilter) {
     goto(filterToUrl(next) || "/", { replaceState: true, keepFocus: true, noScroll: true });
@@ -28,6 +31,15 @@
   {#if recipes.length === 0}
     <p class="empty">Nessuna ricetta ancora. <a href="/recipe/new">Crea la tua prima ricetta</a></p>
   {:else}
+    <input
+      class="search"
+      type="search"
+      bind:value={query}
+      oninput={() => setFilter({ ...filter, query })}
+      placeholder="Cerca per nome…"
+      aria-label="Cerca ricette per nome"
+      autocomplete="off"
+    />
     <div class="filters" role="group" aria-label="Filtri">
       <TagChip
         tag={{ name: "Preferite", icon: "⭐", color: null }}
@@ -42,7 +54,7 @@
     {#if shown.length === 0}
       <p class="empty">
         Nessuna ricetta con questi filtri.
-        <button onclick={() => setFilter({ tagIds: [], favoritesOnly: false })}>Mostra tutte</button>
+        <button onclick={() => ((query = ""), setFilter(emptyFilter))}>Mostra tutte</button>
       </p>
     {:else}
       <ul>
@@ -65,6 +77,9 @@
 </main>
 
 <style>
+  .search {
+    margin-bottom: 0.75rem;
+  }
   .filters {
     display: flex;
     flex-wrap: wrap;
