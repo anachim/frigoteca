@@ -1,10 +1,21 @@
 <script lang="ts">
-  import { invalidateAll } from "$app/navigation";
+  import { goto, invalidateAll } from "$app/navigation";
   import { getDb } from "$lib/db";
   import { putInFridge, removeFromFridge } from "$lib/fridge";
   import { ensureIngredient, formatLine, type IngredientLine } from "$lib/ingredients";
   import { setPantry } from "$lib/match";
   import { describeLacking } from "$lib/results";
+  import { page } from "$app/state";
+  import { filterFromUrl, filterToUrl } from "$lib/filter";
+  import TagChip from "$lib/TagChip.svelte";
+
+  const tagFilter = $derived(filterFromUrl(page.url.searchParams));
+
+  function toggleTag(id: number) {
+    const ids = tagFilter.tagIds;
+    const tagIds = ids.includes(id) ? ids.filter((t) => t !== id) : [...ids, id];
+    goto(`/fridge${filterToUrl({ ...tagFilter, tagIds })}`, { replaceState: true, keepFocus: true, noScroll: true });
+  }
   import { parseLine, parseLines } from "$lib/parse-line";
 
   let { data } = $props();
@@ -94,6 +105,14 @@
     <p class="empty">Il frigo è vuoto. Scrivi cosa hai o tocca gli ingredienti qui sotto.</p>
   {/if}
 
+  {#if data.items.length && data.allTags.length}
+    <div class="chips tag-filter" role="group" aria-label="Filtra risultati per tag">
+      {#each data.allTags as tag (tag.id)}
+        <TagChip {tag} selected={tagFilter.tagIds.includes(tag.id)} onclick={() => toggleTag(tag.id)} />
+      {/each}
+    </div>
+  {/if}
+
   {#if data.results.ready.length || data.results.almost.length}
     <section aria-live="polite">
       {#if data.results.ready.length}
@@ -132,7 +151,9 @@
       {/if}
     </section>
   {:else if data.items.length}
-    <p class="empty">Nessuna ricetta usa ancora questi ingredienti.</p>
+    <p class="empty">
+      {tagFilter.tagIds.length ? "Nessuna ricetta con questi tag usa questi ingredienti." : "Nessuna ricetta usa ancora questi ingredienti."}
+    </p>
   {/if}
 
   {#if suggestions.length}
@@ -201,6 +222,9 @@
   .items .remove {
     padding: 0.6rem 0.9rem 0.6rem 0.4rem;
     color: var(--muted);
+  }
+  .tag-filter {
+    margin-top: 1.5rem;
   }
   .results {
     list-style: none;

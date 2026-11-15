@@ -142,7 +142,7 @@ L'avanzamento dei punti aperti è tracciato nelle
       con badge "verifica quantità" dove serve; risultati aggiornati a ogni modifica del frigo
 - [x] Sotto ogni risultato: "ti manca: 2 uova, 50 g pecorino"
 - [x] "Ti basta per N porzioni": minimo tra disponibile/richiesto sugli ingredienti confrontabili
-- [ ] Ricerca frigo combinabile con filtro tag
+- [x] Ricerca frigo combinabile con filtro tag
 
 ### Fase 3 — Comodità
 - [ ] Porzioni con +/− nel dettaglio ricetta (frazioni esatte)

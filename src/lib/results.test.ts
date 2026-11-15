@@ -6,6 +6,8 @@ import { parseLine } from "./parse-line";
 import { createRecipe, listRecipes } from "./recipes";
 import { describeLacking, groupResults, servingsCovered } from "./results";
 import { testDb } from "./test-db";
+import { emptyFilter, filterRecipes } from "./filter";
+import { listTags, setRecipeTags, tagsByRecipe } from "./tags";
 
 async function setup(fridgeLines: string[]) {
   const db = testDb();
@@ -63,4 +65,19 @@ test("servings covered follow the scarcest comparable ingredient", async () => {
   expect(servingsCovered([ratio(1, 3)], 4)).toBe(1);
   expect(servingsCovered([ratio(2)], null)).toBeNull();
   expect(servingsCovered([{ ...ratio(2), ratio: null }], 4)).toBeNull();
+});
+
+test("fridge results can be narrowed by tag", async () => {
+  const db = testDb();
+  const add = async (name: string, tag: string) => {
+    const id = await createRecipe(db, { name, servings: null, instructions: "", glassMl: null });
+    await saveIngredients(db, id, [parseLine("gin")!]);
+    await setRecipeTags(db, id, [tag]);
+  };
+  await add("Gin tonic", "Cocktail");
+  await add("Pollo al gin", "Secondi");
+  await putInFridge(db, parseLine("gin")!);
+  const [cocktail] = (await listTags(db)).filter((t) => t.name === "Cocktail");
+  const recipes = filterRecipes(await listRecipes(db), await tagsByRecipe(db), { ...emptyFilter, tagIds: [cocktail.id] });
+  expect(names(groupResults(recipes, await matchAll(db)).ready)).toEqual(["Gin tonic"]);
 });
