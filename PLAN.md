@@ -124,7 +124,7 @@ L'avanzamento dei punti aperti è tracciato nelle
 - [x] Eliminazione con "Annulla" (toast) invece di conferma
 - [x] Bozza ricetta salvata automaticamente
 - [x] Tema scuro automatico (`prefers-color-scheme`)
-- [ ] Layout mobile: navigazione in basso, azioni principali a portata di pollice
+- [x] Layout mobile: navigazione in basso, azioni principali a portata di pollice
 - [x] Stato vuoto curato ("Crea la tua prima ricetta")
 
 ### Fase 2 — Ricerca

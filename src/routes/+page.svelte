@@ -23,13 +23,7 @@
 </script>
 
 <main>
-  <header>
-    <h1>Frigoteca</h1>
-    <nav>
-      <a class="button" href="/tags">Tag</a>
-      <a class="button primary" href="/recipe/new">Nuova ricetta</a>
-    </nav>
-  </header>
+  <h1>Frigoteca</h1>
 
   {#if recipes.length === 0}
     <p class="empty">Nessuna ricetta ancora. <a href="/recipe/new">Crea la tua prima ricetta</a></p>
@@ -71,20 +65,9 @@
 </main>
 
 <style>
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-  nav,
   .filters {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  .filters {
     gap: 0.4rem;
     margin-bottom: 1rem;
   }

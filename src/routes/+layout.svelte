@@ -1,10 +1,34 @@
 <script lang="ts">
+  import { page } from "$app/state";
   import { pendingDelete } from "$lib/pending-delete.svelte";
 
   let { children } = $props();
+
+  const sections = [
+    { href: "/", label: "Ricette", icon: "📖" },
+    { href: "/recipe/new", label: "Nuova", icon: "➕" },
+    { href: "/tags", label: "Tag", icon: "🏷️" },
+  ];
+  const path = $derived(page.url.pathname);
+  // Forms keep their own Save/Cancel bar at the bottom, so the app nav steps aside there.
+  const inForm = $derived(path === "/recipe/new" || path.endsWith("/edit"));
+  const current = (href: string) =>
+    href === "/" ? path === "/" || (path.startsWith("/recipe/") && !inForm) : path === href;
 </script>
 
-{@render children()}
+<div class="app" class:in-form={inForm}>
+  {#if !inForm}
+    <nav class="app-nav" aria-label="Sezioni">
+      {#each sections as s (s.href)}
+        <a href={s.href} aria-current={current(s.href) ? "page" : undefined}>
+          <span aria-hidden="true">{s.icon}</span>
+          {s.label}
+        </a>
+      {/each}
+    </nav>
+  {/if}
+  {@render children()}
+</div>
 
 <div class="toast-area" role="status" aria-live="polite">
   {#if pendingDelete.current}
@@ -74,6 +98,62 @@
   :global([role="alert"]) {
     color: var(--danger);
   }
+  .app-nav {
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .app-nav a {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .app-nav a[aria-current="page"] {
+    color: var(--accent);
+    font-weight: 600;
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+  /* Phones: nav at the bottom, within thumb reach. */
+  @media (max-width: 640px) {
+    .app-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 10;
+      justify-content: space-around;
+      padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+      border-bottom: none;
+      border-top: 1px solid var(--border);
+    }
+    .app-nav a {
+      flex-direction: column;
+      gap: 0;
+      font-size: 0.8rem;
+      padding: 0.25rem 1rem;
+    }
+    .app-nav a span {
+      font-size: 1.3rem;
+    }
+    .app:not(.in-form) {
+      padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+    }
+    .app.in-form :global(.form-actions) {
+      position: sticky;
+      bottom: 0;
+      margin: 0 -1rem;
+      padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+    }
+  }
   .toast-area {
     position: fixed;
     left: 1rem;
@@ -99,5 +179,10 @@
     border-color: transparent;
     color: var(--accent);
     font-weight: 600;
+  }
+  @media (max-width: 640px) {
+    .toast-area {
+      bottom: calc(5.5rem + env(safe-area-inset-bottom));
+    }
   }
 </style>

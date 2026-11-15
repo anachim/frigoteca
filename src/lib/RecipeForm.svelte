@@ -124,7 +124,7 @@
 
   {#if error}<p role="alert">{error}</p>{/if}
 
-  <div class="actions">
+  <div class="actions form-actions">
     <button type="button" onclick={cancel}>Annulla</button>
     <button class="primary" type="submit" disabled={saving}>Salva</button>
   </div>
