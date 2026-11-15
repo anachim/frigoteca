@@ -4,7 +4,7 @@ import { saveIngredients } from "./ingredients";
 import { matchAll } from "./match";
 import { parseLine } from "./parse-line";
 import { createRecipe, listRecipes } from "./recipes";
-import { describeLacking, groupResults } from "./results";
+import { describeLacking, groupResults, servingsCovered } from "./results";
 import { testDb } from "./test-db";
 
 async function setup(fridgeLines: string[]) {
@@ -44,8 +44,23 @@ test("amounts that can't be compared still count as ready, flagged to check", as
 });
 
 test("lacking amounts read in the best unit", () => {
-  const need = { ingredientId: 1, name: "farina", status: "short" as const, unit: "g", lacking: { num: 1500, den: 1 } };
+  const need = { ingredientId: 1, name: "farina", status: "short" as const, unit: "g", lacking: { num: 1500, den: 1 }, ratio: null };
   expect(describeLacking(need)).toBe("1,5 kg farina");
   expect(describeLacking({ ...need, unit: "parte", lacking: null })).toBe("farina");
   expect(describeLacking({ ...need, name: "uova", unit: "pz", lacking: { num: 2, den: 1 } })).toBe("2 uova");
+});
+
+test("servings covered follow the scarcest comparable ingredient", async () => {
+  const db = testDb();
+  const id = await createRecipe(db, { name: "Carbonara", servings: 4, instructions: "", glassMl: null });
+  await saveIngredients(db, id, ["400 g spaghetti", "4 uova", "pepe"].map((l) => parseLine(l)!));
+  for (const l of ["1 kg spaghetti", "6 uova", "pepe"]) await putInFridge(db, parseLine(l)!);
+  const { ready } = groupResults(await listRecipes(db), await matchAll(db));
+  expect(ready[0].servings).toBe(6);
+
+  const ratio = (num: number, den = 1) => ({ ingredientId: 1, name: "x", status: "ok" as const, unit: "g", lacking: null, ratio: { num, den } });
+  expect(servingsCovered([ratio(3, 2), ratio(5, 4)], 2)).toBe(2);
+  expect(servingsCovered([ratio(1, 3)], 4)).toBe(1);
+  expect(servingsCovered([ratio(2)], null)).toBeNull();
+  expect(servingsCovered([{ ...ratio(2), ratio: null }], 4)).toBeNull();
 });

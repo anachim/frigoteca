@@ -103,6 +103,9 @@
             <li>
               <a href="/recipe/{r.recipe.id}">
                 <strong>{r.recipe.name}</strong>
+                {#if r.servings !== null}
+                  <span class="lacking">ti basta per {r.servings} {r.servings === 1 ? "porzione" : "porzioni"}</span>
+                {/if}
                 {#if r.toCheck.length}
                   <span class="check">⚠ verifica quantità: {r.toCheck.map((n) => n.name).join(", ")}</span>
                 {/if}

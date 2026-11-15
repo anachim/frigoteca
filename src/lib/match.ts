@@ -15,6 +15,8 @@ export interface Need {
   /** What is lacking, in base units: the whole amount when missing, the difference when short. */
   lacking: Fraction | null;
   unit: string | null;
+  /** How many times the recipe amount is at home (2 = double), when amounts are comparable. */
+  ratio: Fraction | null;
 }
 
 export interface RecipeRow {
@@ -61,14 +63,15 @@ export function matchRecipe(rows: RecipeRow[], fridge: Map<number, FridgeRow>): 
     }
     if (unit === "qb") need = null;
 
-    const base = { ingredientId: r.ingredient_id!, name: r.name ?? "", unit };
+    const base = { ingredientId: r.ingredient_id!, name: r.name ?? "", unit, ratio: null };
     const have = fridge.get(r.ingredient_id!);
     if (!have) return { ...base, status: "missing", lacking: need };
     if (!need) return { ...base, status: "ok", lacking: null };
     const haveQty = qty(have);
     if (!haveQty || have.unit !== unit) return { ...base, status: "check", lacking: null };
-    if (compare(haveQty, need) >= 0) return { ...base, status: "ok", lacking: null };
-    return { ...base, status: "short", lacking: subtract(need, haveQty) };
+    const ratio = divide(haveQty, need);
+    if (compare(haveQty, need) >= 0) return { ...base, status: "ok", lacking: null, ratio };
+    return { ...base, status: "short", lacking: subtract(need, haveQty), ratio };
   });
 }
 

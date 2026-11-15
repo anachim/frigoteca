@@ -9,6 +9,15 @@ export interface Result {
   lacking: Need[];
   /** At home, but the amount couldn't be compared. */
   toCheck: Need[];
+  /** Servings the fridge covers, when the recipe has servings and some amounts are comparable. */
+  servings: number | null;
+}
+
+/** The scarcest comparable ingredient decides: half the needed eggs means half the servings. */
+export function servingsCovered(needs: Need[], servings: number | null): number | null {
+  const ratios = needs.flatMap((n) => n.ratio ?? []);
+  if (!servings || ratios.length === 0) return null;
+  return Math.min(...ratios.map((r) => Math.floor((r.num * servings) / r.den)));
 }
 
 /**
@@ -25,6 +34,7 @@ export function groupResults(recipes: Recipe[], matches: Map<string, Need[]>): {
       recipe,
       lacking: needs.filter((n) => n.status === "short" || n.status === "missing"),
       toCheck: needs.filter((n) => n.status === "check"),
+      servings: servingsCovered(needs, recipe.servings),
     };
     if (result.lacking.length === 0) ready.push(result);
     else if (needs.some((n) => n.status !== "missing")) almost.push(result);
