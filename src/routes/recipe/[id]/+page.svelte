@@ -96,7 +96,8 @@
     <button class="danger" onclick={remove}>
       Elimina
     </button>
-    <a class="button primary" href="/recipe/{data.recipe.id}/edit">Modifica</a>
+    <a class="button" href="/recipe/{data.recipe.id}/edit">Modifica</a>
+    <a class="button primary" href="/recipe/{data.recipe.id}/cook{servings ? `?porzioni=${servings}` : ""}">👨‍🍳 Cucina</a>
   </div>
 </main>
 

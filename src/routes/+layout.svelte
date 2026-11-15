@@ -11,8 +11,8 @@
     { href: "/tags", label: "Tag", icon: "🏷️" },
   ];
   const path = $derived(page.url.pathname);
-  // Forms keep their own Save/Cancel bar at the bottom, so the app nav steps aside there.
-  const inForm = $derived(path === "/recipe/new" || path.endsWith("/edit"));
+  // Forms keep their own Save/Cancel bar and cooking mode wants the whole screen, so the nav steps aside.
+  const inForm = $derived(path === "/recipe/new" || path.endsWith("/edit") || path.endsWith("/cook"));
   const current = (href: string) =>
     href === "/" ? path === "/" || (path.startsWith("/recipe/") && !inForm) : path === href;
 </script>
